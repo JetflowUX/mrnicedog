@@ -1025,7 +1025,7 @@ def build():
 
 
 def _write_sitemap():
-    from build import ROOT
+    from build import OUT
     pages = [("", "1.0", "weekly"), ("grooming", "0.9", "monthly"), ("daycare", "0.9", "monthly"),
              ("training", "0.9", "monthly"), ("booking", "0.8", "monthly"), ("contact", "0.8", "monthly"),
              ("about", "0.7", "yearly"), ("team", "0.6", "yearly"), ("salon", "0.6", "yearly"),
@@ -1033,8 +1033,9 @@ def _write_sitemap():
     urls = "".join(
         f'\n  <url><loc>{ORIGIN}/{s}</loc><changefreq>{c}</changefreq><priority>{p}</priority></url>'
         for s, p, c in pages)
-    (ROOT / "sitemap.xml").write_text(
+    OUT.mkdir(exist_ok=True)
+    (OUT / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}\n</urlset>\n', encoding="utf-8")
-    (ROOT / "robots.txt").write_text(
+    (OUT / "robots.txt").write_text(
         f"User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n", encoding="utf-8")

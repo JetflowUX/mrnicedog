@@ -7,30 +7,38 @@ Their palette, their photographs, their copy and their prices — rebuilt as fas
 crawlable static HTML with a proper local-SEO layer.
 
 ```
-index.html …  11 generated pages
-build.py      shell: head, nav, footer, schema helpers
+build.py      shell: head, nav, footer, schema helpers  ->  writes public/
 content.py    every page's copy and prices
 styles.css    design tokens + components
-script.js     nav, dropdowns, accordions, reveal, enquiry forms
-img/          27 optimised webp images (1.7 MB total)
+script.js     nav, dropdowns, accordions, tabs, reveal, forms
+serve.py      local preview with Vercel-style clean URLs
+img/          optimised webp images
 fonts/        Gabarito + Instrument Sans, self-hosted
-sitemap.xml   generated
-robots.txt    generated
+public/       generated — this is what deploys (git-ignored)
 ```
 
 ## Run it
 
 ```bash
-npm run dev        # builds, then serves on http://localhost:5173
-python3 build.py   # regenerate the HTML after editing content.py
+npm run dev      # build, then preview on http://localhost:5173
+npm run build    # regenerate public/ only
 ```
 
-Deploy with `vercel`, or drop the folder on any static host. Nothing runs at
-request time.
+**Edit `content.py`, never the HTML** — everything in `public/` is generated and
+overwritten on each build. Nav links, address, phone and hours live once in
+`build.py` (`BIZ`, `NAV`, `HOURS`) and propagate to all 11 pages.
 
-**Edit content in `content.py`, not in the `.html` files** — the HTML is generated
-and will be overwritten. Nav links, address, phone and hours live once in
-`build.py` (`BIZ`, `NAV`, `HOURS`) and propagate everywhere.
+## Deploying
+
+Vercel builds with `python3 build.py` and serves `public/`, both set in
+`vercel.json`. Because the output directory is `public/`, the source files
+(`build.py`, `content.py`, this README) are never published.
+
+`cleanUrls` is on, so pages are served at `/grooming` rather than
+`/grooming.html`. Internal links are rewritten to those clean paths at build
+time, so no internal click costs a redirect, and every link matches its own
+`rel="canonical"`. `serve.py` mirrors that locally so dev and production behave
+the same.
 
 ## Design
 

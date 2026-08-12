@@ -2,9 +2,9 @@
   "name": "mr-nice-dog",
   "version": "1.0.0",
   "private": true,
-  "description": "Website for Mr. Nice Dog Grooming Salon, Natick MA — static, no build step at runtime.",
+  "description": "Website for Mr. Nice Dog Grooming Salon, Natick MA \u2014 static, no build step at runtime.",
   "scripts": {
     "build": "python3 build.py",
-    "dev": "python3 build.py && python3 -m http.server 5173"
+    "dev": "python3 build.py && python3 serve.py"
   }
 }

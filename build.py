@@ -11,6 +11,9 @@ import pathlib
 import re
 
 ROOT = pathlib.Path(__file__).parent
+# Everything that gets deployed goes in public/. Source files (build.py,
+# content.py, README) stay out of it and are never served.
+OUT = ROOT / "public"
 ORIGIN = "https://www.mrnicedog.com"
 
 # ---------------------------------------------------------------- business
@@ -297,7 +300,14 @@ def page(slug, title, desc, body, active=None, schema=(), og_image="img/groomed-
 </body>
 </html>
 '''
-    (ROOT / slug).write_text(doc, encoding="utf-8")
+    OUT.mkdir(exist_ok=True)
+    # cleanUrls is on, so link straight to the final URL instead of the .html
+    # file — otherwise every internal click costs a 301 to the same page.
+    doc = re.sub(r'href="index\.html((?:#[^"]*)?)"', r'href="/\1"', doc)
+    doc = re.sub(r'href="([a-z0-9-]+)\.html((?:#[^"]*)?)"', r'href="/\1\2"', doc)
+
+    OUT.mkdir(exist_ok=True)
+    (OUT / slug).write_text(doc, encoding="utf-8")
     return slug
 
 
@@ -345,7 +355,22 @@ def accordion(pairs, reveal=True):
     return f'<div class="acc"{r}>{"".join(items)}</div>'
 
 
+def copy_static():
+    """Assets live at the repo root for easy editing; the build copies them
+    into public/ so the deployed output contains only the site."""
+    import shutil
+    OUT.mkdir(exist_ok=True)
+    for f in ("styles.css", "script.js", "favicon.svg"):
+        shutil.copy2(ROOT / f, OUT / f)
+    for d in ("img", "fonts"):
+        dst = OUT / d
+        if dst.exists():
+            shutil.rmtree(dst)
+        shutil.copytree(ROOT / d, dst)
+
+
 if __name__ == "__main__":
     import content
     content.build()
-    print("built", len(list(ROOT.glob("*.html"))), "pages")
+    copy_static()
+    print("built", len(list(OUT.glob("*.html"))), "pages ->", OUT.name + "/")
